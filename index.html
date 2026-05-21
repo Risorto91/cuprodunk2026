@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CUPRO DUNK 2026 — Registrazione Squadre</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap');
+:root {
+  --orange:#F26522; --orange-dark:#C94E0E; --black:#0E0E0E; --gray-dark:#1A1A1A;
+  --gray-mid:#2C2C2C; --border:rgba(255,255,255,0.08); --text-muted:rgba(255,255,255,0.45);
+  --success:#1DB97E; --warning:#EF9F27; --danger:#E24B4A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:#fff;font-family:'Barlow',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;}
+.header-banner{width:100%;display:block;max-height:220px;object-fit:cover;object-position:center;}
+.form-container{max-width:760px;margin:0 auto;padding:32px 20px 60px;}
+.intro{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.intro h1{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.intro h1 span{color:var(--orange);}
+.intro p{color:var(--text-muted);font-size:14px;}
+
+.cost-box{background:rgba(242,101,34,0.1);border:1px solid rgba(242,101,34,0.35);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px;}
+.cost-icon{font-size:26px;flex-shrink:0;}
+.cost-box h3{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--orange);margin-bottom:3px;}
+.cost-box p{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5;}
+.cost-box strong{color:#fff;}
+
+.download-row{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.btn-download{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;background:var(--gray-dark);border:1px solid var(--border);color:rgba(255,255,255,0.75);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;text-decoration:none;transition:all 0.15s;}
+.btn-download:hover{border-color:var(--orange);color:var(--orange);}
+
+.steps{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap;}
+.step-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:6px;border:1px solid var(--border);background:var(--gray-dark);color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;}
+.step-btn.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+.step-btn.done{background:rgba(29,185,126,0.12);border-color:rgba(29,185,126,0.4);color:var(--success);}
+.step-num{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.step-btn.active .step-num{background:rgba(0,0,0,0.25);}
+.step-btn.done .step-num{background:rgba(29,185,126,0.3);}
+
+.page{display:none;}.page.active{display:block;}
+.card{background:var(--gray-dark);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#fff;margin-bottom:16px;}
+.card-title .orange{color:var(--orange);}
+.row{display:grid;gap:12px;margin-bottom:12px;}
+.row-2{grid-template-columns:1fr 1fr;}.row-3{grid-template-columns:1fr 1fr 1fr;}.row-full{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);}
+.req{color:var(--orange);margin-left:2px;}
+input[type=text],input[type=email],input[type=tel],input[type=date],select{background:var(--gray-mid);border:1px solid rgba(255,255,255,0.1);border-radius:7px;padding:9px 12px;color:#fff;font-family:'Barlow',sans-serif;font-size:14px;width:100%;transition:border-color 0.15s;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus{outline:none;border-color:var(--orange);}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.6);}
+select option{background:var(--gray-mid);}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--orange);flex-shrink:0;cursor:pointer;}
+
+.tpr-card{background:var(--gray-dark);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:14px;}
+.tpr-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;}
+.tpr-label{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:3px;}
+.tpr-score{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;line-height:1;}
+.tpr-limit{font-size:18px;color:var(--text-muted);font-weight:400;}
+.tpr-badge{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 10px;border-radius:5px;background:rgba(29,185,126,0.15);color:var(--success);border:1px solid rgba(29,185,126,0.3);}
+.tpr-badge.warn{background:rgba(239,159,39,0.15);color:var(--warning);border-color:rgba(239,159,39,0.3);}
+.tpr-badge.over{background:rgba(226,75,74,0.15);color:var(--danger);border-color:rgba(226,75,74,0.3);}
+.tpr-bar-bg{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+.tpr-bar-fill{height:100%;border-radius:3px;background:var(--success);transition:width 0.3s,background 0.3s;}
+.tpr-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+.player-card{background:var(--gray-dark);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.player-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.player-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;gap:8px;}
+.optional-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.07);color:var(--text-muted);}
+.pr-chip{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;padding:4px 10px;border-radius:5px;background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid rgba(255,255,255,0.08);}
+.pr-chip.active{background:rgba(242,101,34,0.15);color:var(--orange);border-color:rgba(242,101,34,0.35);}
+.inactivity-box{margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);}
+.inactivity-label{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);cursor:pointer;user-select:none;}
+
+.btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;position:relative;z-index:5;}
+.btn{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;padding:10px 22px;border-radius:7px;cursor:pointer;border:none;transition:all 0.15s;-webkit-appearance:none;appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0);position:relative;z-index:5;display:inline-block;}
+.btn-primary{background:var(--orange);color:#fff;}
+.btn-primary:hover{background:var(--orange-dark);}
+.btn-primary:active{background:var(--orange-dark);transform:scale(0.98);}
+.btn-secondary{background:transparent;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.15);}
+.btn-secondary:hover{background:rgba(255,255,255,0.05);}
+.btn-secondary:active{background:rgba(255,255,255,0.05);}
+.btn-add{width:100%;background:transparent;color:var(--text-muted);border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:10px;font-size:14px;cursor:pointer;font-family:'Barlow',sans-serif;margin-top:4px;transition:all 0.15s;}
+.btn-add:hover{border-color:var(--orange);color:var(--orange);}
+.btn-remove{background:transparent;border:1px solid rgba(226,75,74,0.3);color:var(--danger);border-radius:5px;padding:5px 10px;font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;cursor:pointer;}
+.btn-remove:hover{background:rgba(226,75,74,0.1);}
+
+.dich-intro{font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;}
+.check-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;}
+.check-item span{font-size:14px;color:rgba(255,255,255,0.75);line-height:1.5;}
+.check-item strong{color:#fff;}
+.info-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:14px;font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;}
+.info-box strong{color:#fff;}
+
+.alert{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;}
+.alert-danger{background:rgba(226,75,74,0.12);color:var(--danger);border:1px solid rgba(226,75,74,0.3);}
+.alert-warn{background:rgba(239,159,39,0.12);color:var(--warning);border:1px solid rgba(239,159,39,0.3);}
+.alert-ok{background:rgba(29,185,126,0.1);color:var(--success);border:1px solid rgba(29,185,126,0.3);}
+
+.success-msg{text-align:center;padding:40px 20px;display:none;}
+.success-msg .icon{font-size:56px;margin-bottom:16px;}
+.success-msg h2{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;text-transform:uppercase;color:var(--success);margin-bottom:8px;}
+.success-msg p{color:var(--text-muted);font-size:15px;line-height:1.8;}
+.success-links{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+
+@media(max-width:560px){
+  .row-3{grid-template-columns:1fr 1fr;}
+  .row-2{grid-template-columns:1fr;}
+  .tpr-legend{grid-template-columns:1fr 1fr;}
+  .download-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<img src="https://drive.google.com/thumbnail?id=BANNER_ID&sz=w1400" alt="Cupro Dunk 2026" class="header-banner"
+  onerror="this.style.display='none'">
+
+<div class="form-container">
+
+  <div class="intro">
+    <h1>CUPRO DUNK <span>2026</span></h1>
+    <p>Polisportivo Monti &nbsp;·&nbsp; 17–19 Giugno 2026 &nbsp;·&nbsp; Registrazione squadre</p>
+  </div>
+
+  <div class="cost-box">
+    <div class="cost-icon">💰</div>
+    <div>
+      <h3>Quota di iscrizione</h3>
+      <p><strong>€40 a squadra + 1 consumazione a testa</strong> — da portare in <strong>contanti il primo giorno del torneo (17 giugno 2026)</strong>.<br>Nessun pagamento online richiesto ora.</p>
+    </div>
+  </div>
+
+  <div class="download-row">
+    <a class="btn-download" href="https://drive.google.com/file/d/1Z76vWqP4_teB1jwL7zelAli5e_1MvqVj/view?usp=sharing" target="_blank">
+      📄 Regolamento ufficiale
+    </a>
+    <a class="btn-download" href="https://drive.google.com/file/d/1DB3SBIJjZsYZNzf6h9NDWd6K5qjTapFW/view?usp=sharing" target="_blank">
+      ✍️ Liberatoria — scarica, firma e porta il 17/06
+    </a>
+  </div>
+
+  <div class="steps" id="stepNav">
+    <button class="step-btn active" onclick="goTo(0)"><span class="step-num">1</span> Squadra</button>
+    <button class="step-btn" onclick="goTo(1)"><span class="step-num">2</span> Giocatori</button>
+    <button class="step-btn" onclick="goTo(2)"><span class="step-num">3</span> Dichiarazioni</button>
+  </div>
+
+  <!-- PAGE 0 -->
+  <div class="page active" id="page0">
+    <div class="card">
+      <div class="card-title">🛡 Dati <span class="orange">squadra</span></div>
+      <div class="row row-full">
+        <div class="field"><label>Nome squadra <span class="req">*</span></label>
+          <input type="text" id="nomeSquadra" placeholder="es. The Ballers"></div>
+      </div>
+      <div class="row row-2">
+        <div class="field"><label>Nome capitano <span class="req">*</span></label>
+          <input type="text" id="nomeCapitano" placeholder="Nome"></div>
+        <div class="field"><label>Cognome capitano <span class="req">*</span></label>
+          <input type="text" id="cognomeCapitano" placeholder="Cognome"></div>
+      </div>
+      <div class="row row-2">
+        <div class="field"><label>Telefono <span class="req">*</span></label>
+          <input type="tel" id="telCapitano" placeholder="+39 333 1234567"></div>
+        <div class="field"><label>Email squadra <span class="req">*</span></label>
+          <input type="email" id="emailCapitano" placeholder="email@esempio.it"></div>
+      </div>
+    </div>
+    <div id="alertPage0"></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="nextFromSquadra()" ontouchend="event.preventDefault();nextFromSquadra();">Avanti →</button></div>
+  </div>
+
+  <!-- PAGE 1 -->
+  <div class="page" id="page1">
+    <div class="tpr-card">
+      <div class="tpr-top">
+        <div>
+          <div class="tpr-label">Team Power Rating</div>
+          <div class="tpr-score"><span id="tprTotal">0</span><span class="tpr-limit"> / 55</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">
+            Giocatori: <strong id="playerCount">0</strong>/5–6
+          </div>
+          <span class="tpr-badge" id="tprBadge">OK</span>
+        </div>
+      </div>
+      <div class="tpr-bar-bg"><div class="tpr-bar-fill" id="tprBar" style="width:0%"></div></div>
+      <div class="tpr-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#7F77DD"></div>A1/A2 — 25 pt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>B1 — 15 pt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#378ADD"></div>B2/C — 10 pt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>DR1 — 7 pt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>DR2/DR3/CSI — 3 pt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>Under — 0 pt</div>
+      </div>
+    </div>
+
+    <div id="playersList"></div>
+    <button class="btn-add" id="btnAddPlayer" onclick="addPlayer()">+ Aggiungi giocatore</button>
+    <div id="alertPage1" style="margin-top:12px;"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(0)" ontouchend="event.preventDefault();goTo(0);">← Indietro</button>
+      <button class="btn btn-primary" onclick="nextFromPlayers()" ontouchend="event.preventDefault();nextFromPlayers();">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page" id="page2">
+    <div class="card">
+      <div class="card-title">📋 Dichiarazioni</div>
+      <p class="dich-intro">Il capitano dichiara a nome di tutta la squadra:</p>
+      <label class="check-item"><input type="checkbox" id="d1">
+        <span>Accetto il <strong>regolamento del torneo Cupro Dunk 2026</strong> in tutte le sue parti.</span></label>
+      <label class="check-item"><input type="checkbox" id="d2">
+        <span>Accetto il <strong>sistema Team Power Rating</strong> e confermo che i punti dichiarati sono corretti e verificabili.</span></label>
+      <label class="check-item"><input type="checkbox" id="d3">
+        <span>Prendo atto che <strong>l'organizzazione si riserva la facoltà di modificare</strong> il regolamento, purché nel rispetto dello spirito del torneo.</span></label>
+      <label class="check-item"><input type="checkbox" id="d4">
+        <span>Confermo che la <strong>quota (€40 + consumazione)</strong> sarà pagata in contanti il 17/06 e che la <strong>liberatoria firmata</strong> da ogni giocatore verrà consegnata il medesimo giorno.</span></label>
+    </div>
+    <div class="info-box">
+      💡 <strong>Ricorda:</strong> scarica la liberatoria qui sopra, falla firmare a ogni giocatore (entrambi i genitori se minorenne) e portala il <strong>17 giugno</strong> con i <strong>€40 in contanti</strong>.
+    </div>
+    <div id="alertPage2"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goTo(1)" ontouchend="event.preventDefault();goTo(1);">← Indietro</button>
+      <button class="btn btn-primary" onclick="submitForm()" ontouchend="event.preventDefault();submitForm();">✓ Invia registrazione</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-msg" id="successMsg">
+    <div class="icon">🏀</div>
+    <h2>Iscrizione inviata!</h2>
+    <p>
+      Benvenuti al <strong>Cupro Dunk 2026</strong>!<br>
+      Riceverai una mail di conferma a breve.<br><br>
+      Porta il <strong>17 giugno</strong>:<br>
+      📋 Liberatoria firmata da ogni giocatore<br>
+      💰 €40 in contanti + 1 consumazione a testa
+      <br><br><strong>#CuproDunk #GameOn</strong>
+    </p>
+    <div class="success-links">
+      <a class="btn-download" href="https://drive.google.com/file/d/1DB3SBIJjZsYZNzf6h9NDWd6K5qjTapFW/view?usp=sharing" target="_blank">✍️ Scarica liberatoria</a>
+      <a class="btn-download" href="https://drive.google.com/file/d/1Z76vWqP4_teB1jwL7zelAli5e_1MvqVj/view?usp=sharing" target="_blank">📄 Scarica regolamento</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ================================================================
+// INCOLLA QUI L'URL DEL TUO APPS SCRIPT DOPO IL DEPLOY
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZRq8x7fr6wRwsrHgfe4_wSnI3iyvnsJvnKXl_9-pFdD0bko8vYV2IlTi0Rb6sYiNY/exec';
+// ================================================================
+
+const campionati = [
+  {value:'',label:'— Seleziona —',pt:null},
+  {value:'A1',label:'A1 — 25 pt',pt:25},{value:'A2',label:'A2 — 25 pt',pt:25},
+  {value:'B1',label:'B1 — 15 pt',pt:15},
+  {value:'B2',label:'B2 — 10 pt',pt:10},{value:'C',label:'C — 10 pt',pt:10},
+  {value:'DR1',label:'DR1 — 7 pt',pt:7},
+  {value:'DR2',label:'DR2 — 3 pt',pt:3},{value:'DR3',label:'DR3 — 3 pt',pt:3},
+  {value:'CSI',label:'CSI — 3 pt',pt:3},
+  {value:'Under',label:'Under — 0 pt',pt:0},
+];
+const taglie = ['','XS','S','M','L','XL','XXL','XXXL'];
+let players = [], nextId = 0;
+
+function getPt(v, inatt, anni) {
+  const c = campionati.find(x => x.value === v);
+  if (!c || c.pt === null) return 0;
+  if (inatt && anni >= 2) return 0;
+  return c.pt;
+}
+
+function addPlayer() {
+  if (players.length >= 6) return;
+  players.push({id: nextId++});
+  renderPlayers(); updateTPR();
+}
+
+function removePlayer(id) {
+  players = players.filter(p => p.id !== id);
+  renderPlayers(); updateTPR();
+}
+
+function renderPlayers() {
+  const list = document.getElementById('playersList');
+  list.innerHTML = '';
+  players.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'player-card';
+    const campOpts = campionati.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+    const tagOpts = taglie.map(t => `<option value="${t}">${t||'—'}</option>`).join('');
+    const req = i < 5 ? '<span class="req">*</span>' : '';
+    div.innerHTML = `
+      <div class="player-header">
+        <div class="player-title">👤 Giocatore ${i+1}
+          ${i >= 5 ? '<span class="optional-tag">Facoltativo</span>' : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="pr-chip" id="prChip_${p.id}">— pt</span>
+          ${players.length > 1 ? `<button class="btn-remove" onclick="removePlayer(${p.id})">Rimuovi</button>` : ''}
+        </div>
+      </div>
+      <div class="row row-2">
+        <div class="field"><label>Nome ${req}</label><input type="text" id="p${p.id}_nome" placeholder="Nome" oninput="updateTPR()"></div>
+        <div class="field"><label>Cognome ${req}</label><input type="text" id="p${p.id}_cog" placeholder="Cognome"></div>
+      </div>
+      <div class="row row-3">
+        <div class="field"><label>Data di nascita ${req}</label><input type="date" id="p${p.id}_dob"></div>
+        <div class="field"><label>Ultimo campionato ${req}</label>
+          <select id="p${p.id}_camp" onchange="updateTPR()">${campOpts}</select></div>
+        <div class="field"><label>Taglia maglia</label>
+          <select id="p${p.id}_tag">${tagOpts}</select></div>
+      </div>
+      <div class="inactivity-box">
+        <label class="inactivity-label">
+          <input type="checkbox" id="p${p.id}_inatt" onchange="toggleAnni(${p.id})">
+          Periodo di inattività (non tesserato)
+        </label>
+        <div id="p${p.id}_anniBox" style="display:none;margin-top:10px;">
+          <div class="field"><label>Anni di inattività</label>
+            <select id="p${p.id}_anni" onchange="updateTPR()">
+              <option value="1">1 anno — conta l'ultimo campionato</option>
+              <option value="2">2+ anni — 0 punti</option>
+            </select>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+  document.getElementById('btnAddPlayer').style.display = players.length >= 6 ? 'none' : 'block';
+  document.getElementById('playerCount').textContent = players.length;
+}
+
+function toggleAnni(id) {
+  const cb = document.getElementById('p'+id+'_inatt');
+  document.getElementById('p'+id+'_anniBox').style.display = cb.checked ? 'block' : 'none';
+  updateTPR();
+}
+
+function updateTPR() {
+  let total = 0;
+  players.forEach(p => {
+    const camp = document.getElementById('p'+p.id+'_camp');
+    if (!camp) return;
+    const inatt = document.getElementById('p'+p.id+'_inatt')?.checked || false;
+    const anni = parseInt(document.getElementById('p'+p.id+'_anni')?.value || '1');
+    const pt = getPt(camp.value, inatt, anni);
+    total += pt;
+    const chip = document.getElementById('prChip_'+p.id);
+    if (chip) { chip.textContent = pt+' pt'; chip.className = 'pr-chip'+(camp.value?' active':''); }
+  });
+  document.getElementById('tprTotal').textContent = total;
+  document.getElementById('playerCount').textContent = players.length;
+  const pct = Math.min((total/55)*100, 100);
+  const bar = document.getElementById('tprBar');
+  const badge = document.getElementById('tprBadge');
+  bar.style.width = pct+'%';
+  if (total > 55) { bar.style.background='var(--danger)'; badge.textContent='Superato!'; badge.className='tpr-badge over'; }
+  else if (total >= 48) { bar.style.background='var(--warning)'; badge.textContent='Vicino al limite'; badge.className='tpr-badge warn'; }
+  else { bar.style.background='var(--success)'; badge.textContent='OK'; badge.className='tpr-badge'; }
+}
+
+function goTo(n) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===n));
+  document.querySelectorAll('.step-btn').forEach((s,i) => {
+    s.classList.remove('active','done');
+    if (i===n) s.classList.add('active'); else if (i<n) s.classList.add('done');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextFromSquadra() {
+  const fs = ['nomeSquadra','nomeCapitano','cognomeCapitano','telCapitano','emailCapitano'];
+  const ls = ['Nome squadra','Nome capitano','Cognome capitano','Telefono','Email'];
+  for (let i=0;i<fs.length;i++) {
+    if (!document.getElementById(fs[i]).value.trim()) {
+      document.getElementById('alertPage0').innerHTML = `<div class="alert alert-warn">Compila il campo: <strong>${ls[i]}</strong></div>`;
+      return;
+    }
+  }
+  document.getElementById('alertPage0').innerHTML = '';
+  goTo(1);
+}
+
+function nextFromPlayers() {
+  const total = parseInt(document.getElementById('tprTotal').textContent);
+  const al = document.getElementById('alertPage1');
+  if (players.length < 5) { al.innerHTML='<div class="alert alert-warn">Aggiungi almeno <strong>5 giocatori</strong>.</div>'; return; }
+  if (total > 55) { al.innerHTML='<div class="alert alert-danger">Il TPR supera i <strong>55 punti</strong>. Rivedi il roster.</div>'; return; }
+  for (let i=0;i<Math.min(players.length,5);i++) {
+    const p = players[i];
+    const nome = document.getElementById('p'+p.id+'_nome')?.value.trim();
+    const cog  = document.getElementById('p'+p.id+'_cog')?.value.trim();
+    const dob  = document.getElementById('p'+p.id+'_dob')?.value;
+    const camp = document.getElementById('p'+p.id+'_camp')?.value;
+    if (!nome||!cog||!dob||!camp) {
+      al.innerHTML=`<div class="alert alert-warn">Completa tutti i campi del <strong>Giocatore ${i+1}</strong>.</div>`; return;
+    }
+  }
+  al.innerHTML=''; goTo(2);
+}
+
+function collectData() {
+  const roster = players.map((p,i) => {
+    const inatt = document.getElementById('p'+p.id+'_inatt')?.checked||false;
+    const anni  = parseInt(document.getElementById('p'+p.id+'_anni')?.value||'1');
+    const camp  = document.getElementById('p'+p.id+'_camp')?.value||'';
+    return {
+      n: i+1,
+      nome:     document.getElementById('p'+p.id+'_nome')?.value||'',
+      cognome:  document.getElementById('p'+p.id+'_cog')?.value||'',
+      dob:      document.getElementById('p'+p.id+'_dob')?.value||'',
+      campionato: camp,
+      taglia:   document.getElementById('p'+p.id+'_tag')?.value||'',
+      inattivo: inatt ? 'Sì' : 'No',
+      anni_inatt: inatt ? String(anni) : '—',
+      pt:       getPt(camp, inatt, anni)
+    };
+  });
+  return {
+    squadra:    document.getElementById('nomeSquadra').value,
+    capitano:   document.getElementById('nomeCapitano').value+' '+document.getElementById('cognomeCapitano').value,
+    email:      document.getElementById('emailCapitano').value,
+    tel:        document.getElementById('telCapitano').value,
+    tpr:        document.getElementById('tprTotal').textContent+'/55',
+    n_giocatori: players.length,
+    data:       new Date().toLocaleDateString('it-IT'),
+    roster
+  };
+}
+
+function submitForm() {
+  const checks = ['d1','d2','d3','d4'];
+  const al = document.getElementById('alertPage2');
+  if (!checks.every(id => document.getElementById(id).checked)) {
+    al.innerHTML='<div class="alert alert-warn">Accetta <strong>tutte le dichiarazioni</strong> per procedere.</div>'; return;
+  }
+  al.innerHTML='<div class="alert alert-ok">⏳ Invio in corso...</div>';
+
+  const data = collectData();
+
+  // Invia a Google Apps Script → Sheets + email
+  if (APPS_SCRIPT_URL !== 'INCOLLA_QUI_IL_TUO_APPS_SCRIPT_URL') {
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    }).catch(()=>{});
+  }
+
+  setTimeout(() => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.step-btn').forEach(s => s.classList.add('done'));
+    document.getElementById('successMsg').style.display = 'block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 900);
+}
+
+// Init con 5 giocatori
+addPlayer(); addPlayer(); addPlayer(); addPlayer(); addPlayer();
+
+// Fix mobile touch — collega i bottoni principali anche via addEventListener
+document.addEventListener('DOMContentLoaded', function() {
+  // noop — i bottoni usano onclick inline, questo è solo un safety net
+});
+
+
+
+</script>
+</body>
+</html>
