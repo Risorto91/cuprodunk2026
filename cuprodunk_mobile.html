@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -94,17 +94,6 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
 .btbd-m{color:var(--muted);font-style:italic;font-size:11px;}
 .bracket-meta-m{font-size:10px;color:var(--muted);padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid var(--border);}
 
-/* SCORER */
-.scorer-row-m{display:flex;align-items:center;gap:10px;background:var(--gray-mid);border:1px solid var(--border);border-radius:9px;padding:11px 14px;margin-bottom:8px;}
-.scorer-rank-m{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--muted);width:26px;text-align:center;flex-shrink:0;}
-.scorer-rank-m.top{color:var(--orange);}
-.scorer-info-m{flex:1;}
-.scorer-info-m strong{font-size:15px;display:block;}
-.scorer-info-m span{font-size:11px;color:var(--muted);}
-.scorer-pts-m{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--orange);}
-.scorer-bar-m{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-top:5px;}
-.scorer-bar-fill-m{height:100%;border-radius:2px;background:var(--orange);}
-
 /* REFRESH */
 .refresh-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .refresh-btn{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;}
@@ -128,7 +117,6 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
     <button class="tab" onclick="showTab('classifiche',this)">🏆 Classifiche</button>
     <button class="tab" onclick="showTab('calendario',this)">📅 Calendario</button>
     <button class="tab" onclick="showTab('tabellone',this)">🎯 Tabellone</button>
-    <button class="tab" onclick="showTab('scorer',this)">🏀 Scorer</button>
   </div>
 </div>
 
@@ -172,15 +160,6 @@ html,body{background:var(--black);color:var(--text);font-family:'Barlow',sans-se
     <div class="bracket-mobile" id="tabelloneMobile">
       <div class="no-data-m"><span class="ni">🎯</span>Il tabellone si compilerà al termine dei gironi</div>
     </div>
-  </div>
-
-  <!-- SCORER -->
-  <div class="section" id="tab-scorer">
-    <div class="refresh-row">
-      <div class="sec-title">Top Scorer</div>
-      <button class="refresh-btn" onclick="fetchData()">↻ Aggiorna</button>
-    </div>
-    <div id="scorerMobile"><div class="no-data-m"><span class="ni">🏀</span>Caricamento...</div></div>
   </div>
 
 </div>
@@ -274,7 +253,6 @@ function renderMobile(name) {
   if (name==='classifiche') renderClassificheM();
   if (name==='calendario') renderCalendarioM();
   if (name==='tabellone') renderTabelloneM();
-  if (name==='scorer') renderScorerM();
 }
 
 function renderProssimaM() {
@@ -376,23 +354,6 @@ function renderTabelloneM() {
     }).join('');
     return `<div class="bracket-fase-title">${fase}</div>${matches}`;
   }).join('');
-}
-
-function renderScorerM() {
-  const sc = data.scorer;
-  const wrap = document.getElementById('scorerMobile');
-  if (!sc||!sc.length) { wrap.innerHTML='<div class="no-data-m"><span class="ni">🏀</span>Nessun dato</div>'; return; }
-  const max = sc[0].pt||1;
-  wrap.innerHTML = sc.map((s,i) => `
-    <div class="scorer-row-m">
-      <div class="scorer-rank-m ${i<3?'top':''}">${i+1}</div>
-      <div class="scorer-info-m">
-        <strong>${s.nome}</strong>
-        <span>${s.squadra}</span>
-        <div class="scorer-bar-m"><div class="scorer-bar-fill-m" style="width:${(s.pt/max*100).toFixed(1)}%"></div></div>
-      </div>
-      <div class="scorer-pts-m">${s.pt}</div>
-    </div>`).join('');
 }
 </script>
 </body>
